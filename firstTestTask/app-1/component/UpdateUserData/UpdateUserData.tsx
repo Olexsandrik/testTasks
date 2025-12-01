@@ -3,6 +3,7 @@ import { useAuth, User } from "@/app/providers/AuthProvider";
 import { useForm } from "react-hook-form";
 import InputForm from "../InputForm";
 import { toast } from "react-toastify";
+import { returnToDayData } from "@/utils/unils";
 
 export default function UpdateUserData() {
 	const { user, setUser } = useAuth();
@@ -11,29 +12,6 @@ export default function UpdateUserData() {
 		name?: string;
 		password?: string;
 	}>();
-
-	const returnToDayData = () => {
-		const today = new Date();
-		const dayOfWeekIndex = today.getDay();
-		const days = [
-			"Sunday",
-			"Monday",
-			"Tuesday",
-			"Wednesday",
-			"Thursday",
-			"Friday",
-			"Saturday",
-		];
-
-		const dayOfWeek = days[dayOfWeekIndex];
-		const date = today.toISOString().split("T")[0];
-
-		return (
-			<p className="text-2xl">
-				<span className="text-green-700">{dayOfWeek}</span>, {date}
-			</p>
-		);
-	};
 
 	const onSubmit = (data: { name?: string; password?: string }) => {
 		if (!user?.email) {
