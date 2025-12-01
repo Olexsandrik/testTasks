@@ -4,7 +4,8 @@
 
 ## Технології
 
-- Мова / Фреймворк: Node.js, React, PHP React Native.
+- Мова / Фреймворк: Node.js, React, PHP React Native, Nextjs Nest
+.
 - Інші бібліотеки або інструменти: Express, MySQL, Axios тощо
 
 
