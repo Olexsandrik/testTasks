@@ -1,4 +1,3 @@
-import React from "react";
 import { UseFormRegister } from "react-hook-form";
 
 const InputForm = ({
@@ -14,10 +13,14 @@ const InputForm = ({
 }) => {
 	return (
 		<input
-			type={type}
+			type={type === "name" ? "text" : type}
 			{...register(type)}
-			placeholder={type.charAt(0).toUpperCase() + type.slice(1)}
-			className="w-full px-4 py-3 border  rounded-md transition-all duration-200 text-black"
+			placeholder={
+				type === "password"
+					? "Enter password"
+					: type.charAt(0).toUpperCase() + type.slice(1)
+			}
+			className="w-full px-4 py-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 focus:border-dashed transition-all duration-200 text-black bg-white"
 		/>
 	);
 };

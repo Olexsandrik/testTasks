@@ -2,9 +2,9 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 
 export type User = {
-	name: string;
-	email: string;
-	password: string;
+	name?: string;
+	email?: string;
+	password?: string;
 };
 const AuthContext = createContext<{
 	user: User | null;

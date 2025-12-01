@@ -15,7 +15,7 @@ const Page = () => {
 		password?: string;
 	}>();
 
-	const { user, setUser } = useAuth();
+	const { setUser } = useAuth();
 
 	const onSubmit = (data: { email?: string; password?: string }) => {
 		if (!data) return;
@@ -29,7 +29,7 @@ const Page = () => {
 			const user = users.find((user: FormData) => user.email === data.email);
 			if (user) {
 				setUser(user);
-				redirect("/dashboard");
+				redirect("/content/dashboard");
 			} else {
 				toast.error("usern not find");
 			}
