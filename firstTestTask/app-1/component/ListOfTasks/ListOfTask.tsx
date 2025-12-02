@@ -58,7 +58,7 @@ export default function ListOfTask() {
 		})();
 	}, []);
 	return (
-		<div className="flex justify-between gap-4  flex-col md:flex-row">
+		<div className="flex justify-between gap-4 flex-col md:flex-row">
 			{priority.map((el, key) => {
 				const tasksForStatus = elements.filter(
 					(task) => task.status === el.status
@@ -71,7 +71,7 @@ export default function ListOfTask() {
 						<h2 className="text-lg font-semibold mb-4 capitalize">
 							{el.status.replace("-", " ")} ({el.count})
 						</h2>
-						<div className="flex flex-col gap-3">
+						<div className="flex flex-col gap-3 ">
 							{tasksForStatus.map((task) => {
 								return <CardOfTask key={task.id} task={task} />;
 							})}

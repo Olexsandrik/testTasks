@@ -15,7 +15,7 @@ const formatDate = (dateString: string): string => {
 
 export default function CardOfTask({ task }: CardOfTaskProps) {
 	return (
-		<div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 mb-3 min-w-[200px] min-h-[200px]">
+		<div className="bg-white rounded-lg p-4 shadow-sm border border-gray-200 mb-3 min-w-[160px] min-h-[180px]">
 			<h3 className="font-semibold text-gray-900 mb-2 text-base">
 				{task.title}
 			</h3>
