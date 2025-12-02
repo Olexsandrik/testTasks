@@ -58,7 +58,7 @@ export default function ListOfTask() {
 		})();
 	}, []);
 	return (
-		<div className="flex justify-between gap-4">
+		<div className="flex justify-between gap-4  flex-col md:flex-row">
 			{priority.map((el, key) => {
 				const tasksForStatus = elements.filter(
 					(task) => task.status === el.status
@@ -67,7 +67,7 @@ export default function ListOfTask() {
 				const emptySlotsCount = Math.max(0, maxSlots - tasksForStatus.length);
 
 				return (
-					<div key={key} className="flex flex-col flex-1">
+					<div key={key} className="flex flex-col flex-1 ">
 						<h2 className="text-lg font-semibold mb-4 capitalize">
 							{el.status.replace("-", " ")} ({el.count})
 						</h2>

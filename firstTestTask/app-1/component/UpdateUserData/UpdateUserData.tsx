@@ -8,7 +8,12 @@ import { returnToDayData } from "@/utils/unils";
 export default function UpdateUserData() {
 	const { user, setUser } = useAuth();
 
-	const { register, handleSubmit, reset } = useForm<{
+	const {
+		register,
+		handleSubmit,
+		reset,
+		formState: { errors },
+	} = useForm<{
 		name?: string;
 		password?: string;
 	}>();
@@ -43,35 +48,44 @@ export default function UpdateUserData() {
 	};
 
 	return (
-		<div className="flex-1 min-w-[75%] p-7">
-			<div className="mb-8">
-				<h1 className="text-4xl pb-3 font-bold text-black">Setting</h1>
+		<div className="flex-1 w-full p-4 md:p-7">
+			<div className="mb-6 md:mb-8">
+				<h1 className="text-3xl md:text-4xl pb-3 font-bold text-black">
+					Setting
+				</h1>
 				{returnToDayData()}
 			</div>
 
-			<div className="mt-8">
-				<form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+			<div className="mt-6 md:mt-8">
+				<form
+					onSubmit={handleSubmit(onSubmit)}
+					className="space-y-4 md:space-y-6"
+				>
 					<div className="space-y-2">
 						<label className="block text-sm font-medium text-gray-800">
 							Name
 						</label>
-						<InputForm register={register} type="name" />
+						<InputForm register={register} type="name" classNameProps={""} />
 					</div>
 
 					<div className="space-y-2">
 						<label className="block text-sm font-medium text-gray-800">
 							Password
 						</label>
-						<InputForm register={register} type="password" />
-						<p className="text-sm text-gray-700 underlin">
-							Your password is between 4 and 12 characters
-						</p>
+						<InputForm
+							register={register}
+							type="password"
+							classNameProps={""}
+						/>
+						{errors.password && (
+							<p className="text-sm text-red-500">{errors.password.message}</p>
+						)}
 					</div>
 
-					<div className="flex justify-end mt-8">
+					<div className="flex justify-end mt-6 md:mt-8">
 						<button
 							type="submit"
-							className="bg-[#64C882] hover:bg-green-600 text-white font-bold py-3 px-8 rounded-lg w-100"
+							className="bg-[#64C882] hover:bg-green-600 text-white font-bold py-3 px-6 md:px-8 rounded-lg w-full md:w-auto"
 						>
 							Save
 						</button>
