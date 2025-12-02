@@ -22,6 +22,12 @@ export const returnToDayData = () => {
 		</p>
 	);
 };
+export const formatDate = (dateString: string): string => {
+	const date = new Date(dateString);
+	const day = date.getDate();
+	const month = date.toLocaleString("en-US", { month: "long" });
+	return `${day} ${month}`;
+};
 export const fetchData = async (): Promise<Tasks> => {
 	const response = await fetch(
 		"https://683857ff2c55e01d184cee44.mockapi.io/api/v1/tasks"

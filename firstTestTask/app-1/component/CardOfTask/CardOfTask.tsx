@@ -1,17 +1,13 @@
 import React from "react";
 import Image from "next/image";
 import { Task } from "../ListOfTasks/ListOfTask";
+import { formatDate } from "@/utils/unils";
 
 interface CardOfTaskProps {
 	task: Task;
 }
 
-const formatDate = (dateString: string): string => {
-	const date = new Date(dateString);
-	const day = date.getDate();
-	const month = date.toLocaleString("en-US", { month: "long" });
-	return `${day} ${month}`;
-};
+
 
 export default function CardOfTask({ task }: CardOfTaskProps) {
 	return (

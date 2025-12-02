@@ -11,7 +11,7 @@ const InputForm = ({
 		name?: string;
 	}>;
 	type: "email" | "password" | "name";
-	classNameProps: string;
+	classNameProps?: string;
 }) => {
 	const validationForPassword =
 		type === "password"
