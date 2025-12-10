@@ -1,7 +1,10 @@
 import "./App.css";
+import AnalyticsInfo from "./components/AnalyticsInfo";
 import FirstSection from "./components/FirstSection";
 import Header from "./components/Header";
 import SecondSection from "./components/SecondSection";
+import Footer from "./components/Footer";
+import AnalyticsStats from "./components/AnalyticsStats";
 
 function App() {
 	return (
@@ -14,6 +17,9 @@ function App() {
 				</div>
 
 				<SecondSection />
+
+				<AnalyticsInfo />
+				<AnalyticsStats />
 			</div>
 		</>
 	);
