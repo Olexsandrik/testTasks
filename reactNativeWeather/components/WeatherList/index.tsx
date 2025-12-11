@@ -1,8 +1,9 @@
 import React from "react";
 import { FlatList } from "react-native";
 import { WeatherCard } from "../WeatherCard";
+import { WeatherData } from "../../types";
 
-const WeatherList = ({ weatherData }: { weatherData: any }) => {
+const WeatherList = ({ weatherData }: { weatherData: WeatherData[] }) => {
 	return (
 		<FlatList
 			data={weatherData}

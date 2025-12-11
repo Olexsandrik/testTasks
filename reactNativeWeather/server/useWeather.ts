@@ -11,6 +11,7 @@ export const useWeather = (latitude?: number, longitude?: number) => {
 				`${process.env.BASE_URL}/forecast.json?key=${process.env.API_KEY}&q=${latitude},${longitude}&days=${days}`
 			);
 			const responseData = await response.json();
+			console.log(responseData.forecast.forecastday);
 			setWeatherData(responseData.forecast.forecastday);
 		} catch (error) {
 			console.error(error);

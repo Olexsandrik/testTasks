@@ -49,7 +49,7 @@ const AnalisWeather = () => {
 				}}
 			/>
 
-			<WeatherList weatherData={weatherData} />
+			<WeatherList weatherData={weatherData || []} />
 		</View>
 	);
 };

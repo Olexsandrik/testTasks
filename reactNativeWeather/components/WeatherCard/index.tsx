@@ -1,7 +1,8 @@
 import React from "react";
 import { View, Text, Image, StyleSheet } from "react-native";
+import { WeatherData } from "../../types";
 
-export const WeatherCard = ({ weatherData }: { weatherData: any }) => {
+export const WeatherCard = ({ weatherData }: { weatherData: WeatherData }) => {
 	return (
 		<View style={styles.card}>
 			<View style={styles.header}>
