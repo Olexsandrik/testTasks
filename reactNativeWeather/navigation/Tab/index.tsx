@@ -1,4 +1,6 @@
+import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+
 import HomeScreen from "../Screens/Home";
 import SettingsScreen from "../Screens/Settings";
 import { Ionicons } from "@expo/vector-icons";

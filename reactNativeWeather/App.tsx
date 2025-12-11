@@ -1,4 +1,3 @@
-import { NavigationContainer } from "@react-navigation/native";
 import { MyTabs } from "./navigation/Tab";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { Provider } from "react-redux";

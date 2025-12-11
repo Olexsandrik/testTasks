@@ -1,7 +1,8 @@
 import React from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 import { useSelector } from "react-redux";
 import { darkTheme, lightTheme } from "../../../utils/theme/theme";
+import AnalisWeather from "../../../components/AnalisWeather/AnalisWeather";
 
 export default function HomeScreen() {
 	const { darkMode } = useSelector((state: any) => state.theme);
@@ -10,12 +11,12 @@ export default function HomeScreen() {
 		<View
 			style={{
 				flex: 1,
-				justifyContent: "center",
+				paddingTop: 100,
 				alignItems: "center",
 				backgroundColor: theme.backgroundColor,
 			}}
 		>
-			<Text style={{ color: theme.color }}>Home</Text>
+			<AnalisWeather />
 		</View>
 	);
 }
