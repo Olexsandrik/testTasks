@@ -38,12 +38,12 @@ export type ForecastdayList = Forecastday[];
 
 export type WeatherData = Forecastday;
 
-// User types
+
 export interface User {
   id: string;
   name: string;
   email: string;
-  profilePhoto?: string; // URL or base64 string
+  profilePhoto?: string; 
   createdAt: string;
 }
 

@@ -1,7 +1,7 @@
 import * as Location from "expo-location";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { useWeather } from "../../server/useWeather";
 import WeatherList from "../WeatherList";
 
@@ -9,6 +9,7 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { darkTheme, lightTheme } from "../../utils/theme/theme";
 import { WeatherData } from "../../types";
 import WeatherButton from "../ui/WeatherButton";
+import { setLocationAction } from "../../store/slices/locationSlice";
 
 
 const AnalisWeather = () => {
@@ -17,8 +18,14 @@ const AnalisWeather = () => {
 		location?.coords.latitude,
 		location?.coords.longitude
 	);
+
 	const [city, setCity] = useState<any>(null);
+
+
+	const dispatch = useDispatch();
+
 	const { darkMode } = useSelector((state: any) => state.theme);
+
 	const theme = darkMode ? darkTheme : lightTheme;
 
 	const weatherDataArray: WeatherData[] = weatherData || [];
@@ -36,6 +43,7 @@ const AnalisWeather = () => {
 
 			const location = await Location.getCurrentPositionAsync({});
 			setLocation(location);
+			dispatch(setLocationAction({latitude: location.coords.latitude, longitude: location.coords.longitude}));
 
 			getCityFromCoords(location.coords.latitude, location.coords.longitude);
 		}

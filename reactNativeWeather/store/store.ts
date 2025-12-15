@@ -1,12 +1,12 @@
 import { configureStore } from "@reduxjs/toolkit";
 import themeReducer from "./slices/themeSlice";
-import userReducer from "./slices/userSlice";
-
+import locationReducer from "./slices/locationSlice";
 export const store = configureStore({
 	reducer: {
 		theme: themeReducer,
-		user: userReducer,
+		location: locationReducer,
 	},
 });
+export type RootState = ReturnType<typeof store.getState>
 
-export default store;
+export default store
