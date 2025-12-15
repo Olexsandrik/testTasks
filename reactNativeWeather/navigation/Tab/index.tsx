@@ -2,11 +2,13 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 
 import HomeScreen from "../Screens/Home";
-import SettingsScreen from "../Screens/Settings";
 import { Ionicons } from "@expo/vector-icons";
 import { NavigationContainer } from "@react-navigation/native";
 import { useSelector } from "react-redux";
 import { darkTheme, lightTheme } from "../../utils/theme/theme";
+import Analytics from "../Screens/Analytics";
+import News from "../Screens/News";
+import SettingsNavigation from "../SettingsNavigation";
 
 const Tab = createBottomTabNavigator();
 
@@ -30,9 +32,40 @@ export function MyTabs() {
 						},
 					}}
 				/>
+					<Tab.Screen
+					name="Analytics"
+					component={Analytics}
+					options={{
+						tabBarLabel: "Analytics",
+						tabBarIcon: ({ color, size }) => (
+							<Ionicons name="analytics" size={size} color={color} />
+						),
+						headerShown: false,
+						tabBarStyle: {
+							backgroundColor: theme.backgroundColor,
+						},
+					}}
+					/>
+
+				<Tab.Screen
+					name="News"
+					component={News}
+					options={{
+						tabBarLabel: "News",
+						tabBarIcon: ({ color, size }) => (
+							<Ionicons name="newspaper" size={size} color={color} />
+						),
+						headerShown: false,
+						tabBarStyle: {
+							backgroundColor: theme.backgroundColor,
+						},
+					}}	
+				
+				/>	
+
 				<Tab.Screen
 					name="Settings"
-					component={SettingsScreen}
+					component={SettingsNavigation}
 					options={{
 						tabBarLabel: "Settings",
 
@@ -45,6 +78,7 @@ export function MyTabs() {
 						},
 					}}
 				/>
+			
 			</Tab.Navigator>
 		</NavigationContainer>
 	);
