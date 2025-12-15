@@ -1,15 +1,15 @@
 import * as Location from "expo-location";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from "react-native";
+import React, { useCallback, useEffect, useState } from "react";
+import { View, Text, StyleSheet } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { useWeather } from "../../server/useWeather";
 import WeatherList from "../WeatherList";
-
 import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { darkTheme, lightTheme } from "../../utils/theme/theme";
 import { WeatherData } from "../../types";
 import WeatherButton from "../ui/WeatherButton";
 import { setLocationAction } from "../../store/slices/locationSlice";
+import { RootState } from "../../store/store";
 
 
 const AnalisWeather = () => {
@@ -19,12 +19,12 @@ const AnalisWeather = () => {
 		location?.coords.longitude
 	);
 
-	const [city, setCity] = useState<any>(null);
+	const [city, setCity] = useState<string | null>(null);
 
 
 	const dispatch = useDispatch();
 
-	const { darkMode } = useSelector((state: any) => state.theme);
+	const { darkMode } = useSelector((state: RootState) => state.theme);
 
 	const theme = darkMode ? darkTheme : lightTheme;
 
@@ -60,11 +60,11 @@ const AnalisWeather = () => {
 				latitude: lat,
 				longitude: lon,
 			});
-			setCity(result[0]);
+			setCity(result[0].city);
 		} catch (error) {
 			console.error("Error geocoding:", error);
-			setCity({ city: "Location unavailable" });
-		}
+			setCity("Location unavailable");
+		}	
 	}, []);
 
 	const formatLocation = (locationObj: any) => {
@@ -97,10 +97,8 @@ const AnalisWeather = () => {
 		}
 	]
 
-
-	return (
-		<ScrollView style={[styles.container, { backgroundColor: theme.backgroundColor }]}>
-
+	const renderHeader = () => (
+		<>
 			<View style={styles.header}>
 				<MaterialCommunityIcons name="weather-partly-cloudy" size={48} color="#4da6ff" />
 				<Text style={[styles.title, { color: theme.color }]}>Weather Analytics</Text>
@@ -109,21 +107,17 @@ const AnalisWeather = () => {
 				</Text>
 			</View>
 
-
-			
 			{location && (
 				<View style={[styles.locationCard, { backgroundColor: theme.color === '#000000' ? '#FFFFFF' : '#000000' }]}>
 					<MaterialCommunityIcons name="map-marker" size={20} color="#4da6ff" />
 				
 					<Text style={[styles.locationText, { color: theme.color }]}>
-						Location: {city ? formatLocation(city) : 'Loading location...'}
+						Location: {city || 'Loading location...'}
 					</Text>
 				</View>
 			)}
 
-		
 			<View style={styles.buttonContainer}>
-
 				{WeatherButttons.map((button) => (
 					<WeatherButton
 						key={button.days}
@@ -138,14 +132,27 @@ const AnalisWeather = () => {
 			</View>
 
 			{weatherDataArray && weatherDataArray.length > 0 && (
-				<View style={styles.weatherSection}>
-					<Text style={[styles.sectionTitle, { color: theme.color }]}>
-						Forecast Results
-					</Text>
-					<WeatherList weatherData={weatherDataArray} />
+				<Text style={[styles.sectionTitle, { color: theme.color }]}>
+					Forecast Results
+				</Text>
+			)}
+		</>
+	);
+
+	return (
+		<View style={[styles.container, { backgroundColor: theme.backgroundColor }]}>
+			{weatherDataArray && weatherDataArray.length > 0 ? (
+				<WeatherList 
+					weatherData={weatherDataArray} 
+					ListHeaderComponent={renderHeader}
+					contentContainerStyle={{ paddingHorizontal: 0 }}
+				/>
+			) : (
+				<View style={styles.container}>
+					{renderHeader()}
 				</View>
 			)}
-		</ScrollView>
+		</View>
 	);
 };
 
@@ -153,6 +160,7 @@ const styles = StyleSheet.create({
 	container: {
 		flex: 1,
 		paddingHorizontal: 20,
+		paddingTop: 20,
 	},
 	header: {
 		alignItems: 'center',
