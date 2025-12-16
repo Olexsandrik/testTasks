@@ -1,12 +1,20 @@
-import React from "react";
-import { View, Text, Image, StyleSheet } from "react-native";
-import { WeatherData } from "../../types";
+import { useTranslation } from "react-i18next";
+import { Image, StyleSheet, Text, View } from "react-native";
+import { useSelector } from "react-redux";
+import type { RootState } from "../../store/store";
+import type { WeatherData } from "../../types";
+import { darkTheme, lightTheme } from "../../utils/theme/theme";
 
 export const WeatherCard = ({ weatherData }: { weatherData: WeatherData }) => {
+	const { t } = useTranslation();
+	const { darkMode } = useSelector((state: RootState) => state.theme);
+	const theme = darkMode ? darkTheme : lightTheme;
 	return (
-		<View style={styles.card}>
+		<View style={[styles.card, { backgroundColor: theme.backgroundColor }]}>
 			<View style={styles.header}>
-				<Text style={styles.date}>{weatherData.date}</Text>
+				<Text style={[styles.date, { color: theme.color }]}>
+					{weatherData.date}
+				</Text>
 
 				<Image
 					source={{ uri: `https:${weatherData.day.condition.icon}` }}
@@ -14,17 +22,22 @@ export const WeatherCard = ({ weatherData }: { weatherData: WeatherData }) => {
 				/>
 			</View>
 			<View style={styles.temps}>
-				<Text style={styles.tempText}>Max: {weatherData.day.maxtemp_c}°C</Text>
-				<Text style={styles.tempText}>Min: {weatherData.day.mintemp_c}°C</Text>
+				<Text style={[styles.tempText, { color: theme.color }]}>
+					{t("weatherCard.max")}: {weatherData.day.maxtemp_c}°C
+				</Text>
+				<Text style={[styles.tempText, { color: theme.color }]}>
+					{t("weatherCard.min")}: {weatherData.day.mintemp_c}°C
+				</Text>
 			</View>
-			<Text style={styles.condition}>{weatherData.day.condition.text}</Text>
+			<Text style={[styles.condition, { color: theme.color }]}>
+				{weatherData.day.condition.text}
+			</Text>
 		</View>
 	);
 };
 
 const styles = StyleSheet.create({
 	card: {
-		backgroundColor: "#4da6ff",
 		borderRadius: 12,
 		padding: 15,
 		marginBottom: 10,
@@ -41,7 +54,6 @@ const styles = StyleSheet.create({
 		marginBottom: 10,
 	},
 	date: {
-		color: "#fff",
 		fontSize: 16,
 		fontWeight: "bold",
 	},
@@ -55,12 +67,10 @@ const styles = StyleSheet.create({
 		marginBottom: 5,
 	},
 	tempText: {
-		color: "#fff",
 		fontSize: 14,
 		fontWeight: "600",
 	},
 	condition: {
-		color: "#fff",
 		fontSize: 14,
 		fontStyle: "italic",
 		textAlign: "center",

@@ -1,22 +1,14 @@
-import React from "react";
-import { FlatList, ViewStyle } from "react-native";
+import { FlatList } from "react-native";
+import type { WeatherData } from "../../types";
 import { WeatherCard } from "../WeatherCard";
-import { WeatherData } from "../../types";
 
-interface WeatherListProps {
-	weatherData: WeatherData[];
-	ListHeaderComponent?: React.ComponentType<any> | React.ReactElement | null;
-	contentContainerStyle?: ViewStyle;
-}
-
-const WeatherList = ({ weatherData, ListHeaderComponent, contentContainerStyle }: WeatherListProps) => {
+const WeatherList = ({ weatherData }: { weatherData: WeatherData[] }) => {
 	return (
 		<FlatList
 			data={weatherData}
 			keyExtractor={(item) => item.date}
 			renderItem={({ item }) => <WeatherCard weatherData={item} />}
-			contentContainerStyle={[{ padding: 10 }, contentContainerStyle]}
-			ListHeaderComponent={ListHeaderComponent}
+			contentContainerStyle={{ padding: 10 }}
 		/>
 	);
 };

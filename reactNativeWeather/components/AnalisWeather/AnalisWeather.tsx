@@ -1,26 +1,29 @@
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import * as Location from "expo-location";
-import React, { useCallback, useEffect, useState } from "react";
-import { View, Text, StyleSheet } from "react-native";
+import { useCallback, useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import { StyleSheet, Text, View } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 import { useWeather } from "../../server/useWeather";
-import WeatherList from "../WeatherList";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
-import { darkTheme, lightTheme } from "../../utils/theme/theme";
-import { WeatherData } from "../../types";
-import WeatherButton from "../ui/WeatherButton";
 import { setLocationAction } from "../../store/slices/locationSlice";
-import { RootState } from "../../store/store";
-
+import type { RootState } from "../../store/store";
+import type { WeatherData } from "../../types";
+import { darkTheme, lightTheme } from "../../utils/theme/theme";
+import WeatherButton from "../ui/WeatherButton";
+import WeatherList from "../WeatherList";
 
 const AnalisWeather = () => {
-	const [location, setLocation] = useState<Location.LocationObject | null>(null);
+	const { t } = useTranslation();
+
+	const [location, setLocation] = useState<Location.LocationObject | null>(
+		null,
+	);
 	const { weatherData, handlerWeatherData } = useWeather(
 		location?.coords.latitude,
-		location?.coords.longitude
+		location?.coords.longitude,
 	);
 
 	const [city, setCity] = useState<string | null>(null);
-
 
 	const dispatch = useDispatch();
 
@@ -30,89 +33,98 @@ const AnalisWeather = () => {
 
 	const weatherDataArray: WeatherData[] = weatherData || [];
 
-
-
+	const getCityFromCoords = useCallback(
+		async (lat: number, lon: number) => {
+			try {
+				const result = await Location.reverseGeocodeAsync({
+					latitude: lat,
+					longitude: lon,
+				});
+				setCity(result[0].city);
+			} catch (error) {
+				console.error(t("weatherAnalytics.errorGeocoding"), error);
+				setCity(t("weatherAnalytics.locationUnavailable"));
+			}
+		},
+		[t],
+	);
 
 	useEffect(() => {
 		async function getCurrentLocation() {
-			let { status } = await Location.requestForegroundPermissionsAsync();
+			const { status } = await Location.requestForegroundPermissionsAsync();
 			if (status !== "granted") {
-				console.log("Permission to access location was denied");
+				console.log(t("weatherAnalytics.permissionDenied"));
 				return;
 			}
 
 			const location = await Location.getCurrentPositionAsync({});
 			setLocation(location);
-			dispatch(setLocationAction({latitude: location.coords.latitude, longitude: location.coords.longitude}));
+			dispatch(
+				setLocationAction({
+					latitude: location.coords.latitude,
+					longitude: location.coords.longitude,
+				}),
+			);
 
 			getCityFromCoords(location.coords.latitude, location.coords.longitude);
 		}
 
 		getCurrentLocation();
-		
-	}, []);
-
-
-
-	const getCityFromCoords = useCallback(async (lat: number, lon: number) => {
-		try {
-			const result = await Location.reverseGeocodeAsync({
-				latitude: lat,
-				longitude: lon,
-			});
-			setCity(result[0].city);
-		} catch (error) {
-			console.error("Error geocoding:", error);
-			setCity("Location unavailable");
-		}	
-	}, []);
-
-	const formatLocation = (locationObj: any) => {
-		if (!locationObj) return "Unknown location";
-
-		const city = locationObj.city || locationObj.name || locationObj.region;
-		const region = locationObj.region && locationObj.region !== city ? locationObj.region : '';
-		const country = locationObj.country || '';
-
-		const parts = [city, region || country].filter(Boolean);
-		return parts.join(', ') || "Unknown location";
-	};
+	}, [getCityFromCoords, dispatch, t]);
 
 	const WeatherButttons = [
 		{
 			days: 1,
-			title: "Today's Weather",
+			title: t("weatherAnalytics.buttons.today"),
 			icon: "calendar-today",
 		},
 		{
 			days: 3,
-			title: "3-Day Forecast",
+			title: t("weatherAnalytics.buttons.threeDay"),
 			icon: "calendar-week",
-	
 		},
 		{
 			days: 14,
-			title: "14-Day Forecast",
+			title: t("weatherAnalytics.buttons.fourteenDay"),
 			icon: "calendar-month",
-		}
-	]
+		},
+	];
 
 	const renderHeader = () => (
 		<>
 			<View style={styles.header}>
-				<MaterialCommunityIcons name="weather-partly-cloudy" size={48} color="#4da6ff" />
-				<Text style={[styles.title, { color: theme.color }]}>Weather Analytics</Text>
-				<Text style={[styles.subtitle, { color: theme.color === '#000000' ? '#000000'  :  '#FFFFFF' }]}>
-					Get detailed weather forecasts
+				<MaterialCommunityIcons
+					name="weather-partly-cloudy"
+					size={48}
+					color="#4da6ff"
+				/>
+				<Text style={[styles.title, { color: theme.color }]}>
+					{t("weatherAnalytics.title")}
+				</Text>
+				<Text
+					style={[
+						styles.subtitle,
+						{ color: theme.color === "#000000" ? "#000000" : "#FFFFFF" },
+					]}
+				>
+					{t("weatherAnalytics.subtitle")}
 				</Text>
 			</View>
 
 			{location && (
-				<View style={[styles.locationCard, { backgroundColor: theme.color === '#000000' ? '#FFFFFF' : '#000000' }]}>
+				<View
+					style={[
+						styles.locationCard,
+						{
+							backgroundColor:
+								theme.color === "#000000" ? "#FFFFFF" : "#000000",
+						},
+					]}
+				>
 					<MaterialCommunityIcons name="map-marker" size={20} color="#4da6ff" />
-				
+
 					<Text style={[styles.locationText, { color: theme.color }]}>
-						Location: {city || 'Loading location...'}
+						Location: {city || t("weatherAnalytics.locationLoading")}
 					</Text>
 				</View>
 			)}
@@ -133,25 +145,21 @@ const AnalisWeather = () => {
 
 			{weatherDataArray && weatherDataArray.length > 0 && (
 				<Text style={[styles.sectionTitle, { color: theme.color }]}>
-					Forecast Results
+					{t("weatherAnalytics.forecastResults")}
 				</Text>
 			)}
 		</>
 	);
 
 	return (
-		<View style={[styles.container, { backgroundColor: theme.backgroundColor }]}>
-			{weatherDataArray && weatherDataArray.length > 0 ? (
-				<WeatherList 
-					weatherData={weatherDataArray} 
-					ListHeaderComponent={renderHeader}
-					contentContainerStyle={{ paddingHorizontal: 0 }}
-				/>
-			) : (
-				<View style={styles.container}>
-					{renderHeader()}
-				</View>
-			)}
+		<View
+			style={[styles.container, { backgroundColor: theme.backgroundColor }]}
+		>
+			<View style={styles.container}>
+				{renderHeader()}
+
+				<WeatherList weatherData={weatherDataArray} />
+			</View>
 		</View>
 	);
 };
@@ -163,27 +171,27 @@ const styles = StyleSheet.create({
 		paddingTop: 20,
 	},
 	header: {
-		alignItems: 'center',
+		alignItems: "center",
 		paddingTop: 50,
 		paddingBottom: 30,
 	},
 	title: {
 		fontSize: 28,
-		fontWeight: 'bold',
+		fontWeight: "bold",
 		marginTop: 15,
 		marginBottom: 5,
 	},
 	subtitle: {
 		fontSize: 16,
-		textAlign: 'center',
+		textAlign: "center",
 	},
 	locationCard: {
-		flexDirection: 'row',
-		alignItems: 'center',
+		flexDirection: "row",
+		alignItems: "center",
 		padding: 15,
 		borderRadius: 12,
 		marginBottom: 25,
-		shadowColor: '#000',
+		shadowColor: "#000",
 		shadowOffset: { width: 0, height: 2 },
 		shadowOpacity: 0.1,
 		shadowRadius: 4,
@@ -192,43 +200,43 @@ const styles = StyleSheet.create({
 	locationText: {
 		fontSize: 14,
 		marginLeft: 8,
-		fontWeight: '500',
+		fontWeight: "500",
 	},
 	buttonContainer: {
 		marginBottom: 30,
 	},
 	weatherButton: {
-		flexDirection: 'row',
-		alignItems: 'center',
+		flexDirection: "row",
+		alignItems: "center",
 		padding: 20,
 		borderRadius: 15,
 		marginBottom: 12,
-		shadowColor: '#000',
+		shadowColor: "#000",
 		shadowOffset: { width: 0, height: 3 },
 		shadowOpacity: 0.15,
 		shadowRadius: 5,
 		elevation: 4,
 		borderWidth: 1,
-		borderColor: 'rgba(77, 166, 255, 0.2)',
+		borderColor: "rgba(77, 166, 255, 0.2)",
 	},
 	buttonText: {
 		fontSize: 18,
-		fontWeight: '600',
+		fontWeight: "600",
 		marginLeft: 15,
 		flex: 1,
 	},
 	buttonSubtext: {
 		fontSize: 12,
-		fontWeight: '400',
+		fontWeight: "400",
 	},
 	weatherSection: {
 		marginTop: 10,
 	},
 	sectionTitle: {
 		fontSize: 22,
-		fontWeight: 'bold',
+		fontWeight: "bold",
 		marginBottom: 15,
-		textAlign: 'center',
+		textAlign: "center",
 	},
 });
 

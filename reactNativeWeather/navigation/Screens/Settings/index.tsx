@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { setDarkMode } from "../../../store/slices/themeSlice";
 import { lightTheme, darkTheme } from "../../../utils/theme/theme";
 
-export default function SettingsScreen() {
+export default function ChangeThemeScreen() {
 	const dispatch = useDispatch();
 	const { darkMode } = useSelector((state: any) => state.theme);
 	const handleDarkMode = () => {

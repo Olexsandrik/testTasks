@@ -1,19 +1,19 @@
-import React from "react";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-
-import HomeScreen from "../Screens/Home";
 import { Ionicons } from "@expo/vector-icons";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
+import { useTranslation } from "react-i18next";
 import { useSelector } from "react-redux";
+import type { RootState } from "../../store/store";
 import { darkTheme, lightTheme } from "../../utils/theme/theme";
 import Analytics from "../Screens/Analytics";
-import News from "../Screens/News";
+import HomeScreen from "../Screens/Home";
 import SettingsNavigation from "../SettingsNavigation";
 
 const Tab = createBottomTabNavigator();
 
 export function MyTabs() {
-	const { darkMode } = useSelector((state: any) => state.theme);
+	const { t } = useTranslation();
+	const { darkMode } = useSelector((state: RootState) => state.theme);
 	const theme = darkMode ? darkTheme : lightTheme;
 	return (
 		<NavigationContainer>
@@ -22,7 +22,7 @@ export function MyTabs() {
 					name="Home"
 					component={HomeScreen}
 					options={{
-						tabBarLabel: "Home",
+						tabBarLabel: t("navigation.tabs.home"),
 						tabBarIcon: ({ color, size }) => (
 							<Ionicons name="home" size={size} color={color} />
 						),
@@ -32,11 +32,11 @@ export function MyTabs() {
 						},
 					}}
 				/>
-					<Tab.Screen
+				<Tab.Screen
 					name="Analytics"
 					component={Analytics}
 					options={{
-						tabBarLabel: "Analytics",
+						tabBarLabel: t("navigation.tabs.analytics"),
 						tabBarIcon: ({ color, size }) => (
 							<Ionicons name="analytics" size={size} color={color} />
 						),
@@ -45,30 +45,13 @@ export function MyTabs() {
 							backgroundColor: theme.backgroundColor,
 						},
 					}}
-					/>
-
-				<Tab.Screen
-					name="News"
-					component={News}
-					options={{
-						tabBarLabel: "News",
-						tabBarIcon: ({ color, size }) => (
-							<Ionicons name="newspaper" size={size} color={color} />
-						),
-						headerShown: false,
-						tabBarStyle: {
-							backgroundColor: theme.backgroundColor,
-						},
-					}}	
-				
-				/>	
+				/>
 
 				<Tab.Screen
 					name="Settings"
 					component={SettingsNavigation}
 					options={{
-						tabBarLabel: "Settings",
-
+						tabBarLabel: t("navigation.tabs.settings"),
 						tabBarIcon: ({ color, size }) => (
 							<Ionicons name="settings" size={size} color={color} />
 						),
@@ -78,7 +61,6 @@ export function MyTabs() {
 						},
 					}}
 				/>
-			
 			</Tab.Navigator>
 		</NavigationContainer>
 	);

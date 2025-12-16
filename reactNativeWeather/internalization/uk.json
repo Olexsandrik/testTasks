@@ -1,0 +1,54 @@
+{
+	"weatherAnalytics": {
+		"title": "Аналітика погоди",
+		"subtitle": "Отримайте детальні прогнози погоди",
+		"locationLoading": "Завантаження місцезнаходження...",
+		"locationUnavailable": "Місцезнаходження недоступне",
+		"forecastResults": "Результати прогнозу",
+		"buttons": {
+			"today": "Погода сьогодні",
+			"threeDay": "3-денний прогноз",
+			"fourteenDay": "14-денний прогноз"
+		},
+		"permissionDenied": "Дозвіл на доступ до місцезнаходження було відмовлено",
+		"errorGeocoding": "Помилка геокодування",
+		"charts": {
+			"precipitation": "Кількість опадів (мм)",
+			"temperature": "Середня температура (°C)"
+		}
+	},
+	"navigation": {
+		"tabs": {
+			"home": "Головна",
+			"analytics": "Аналітика",
+			"settings": "Налаштування"
+		},
+		"drawer": {
+			"userInfo": "Інформація про користувача",
+			"changeTheme": "Змінити тему",
+			"changeLanguage": "Змінити мову"
+		}
+	},
+	"weatherCard": {
+		"max": "Макс",
+		"min": "Мін"
+	},
+	"userInfo": {
+		"name": "Ім'я",
+		"email": "Електронна пошта",
+		"enterName": "Введіть ваше ім'я",
+		"enterEmail": "Введіть вашу електронну пошту",
+		"editProfile": "Редагувати профіль",
+		"saveChanges": "Зберегти зміни",
+		"cancel": "Скасувати",
+		"success": "Успішно",
+		"userInfoUpdated": "Інформацію про користувача успішно оновлено!",
+		"error": "Помилка",
+		"nameEmailRequired": "Ім'я та електронна пошта не можуть бути порожніми",
+		"invalidEmail": "Будь ласка, введіть дійсну адресу електронної пошти",
+		"failedLoadData": "Не вдалося завантажити дані користувача",
+		"failedSaveData": "Не вдалося зберегти дані користувача",
+		"permissionRequired": "Потрібен дозвіл",
+		"mediaLibraryPermission": "Потрібен дозвіл на доступ до медіатеки."
+	}
+}

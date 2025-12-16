@@ -1,0 +1,54 @@
+{
+	"weatherAnalytics": {
+		"title": "Weather Analytics",
+		"subtitle": "Get detailed weather forecasts",
+		"locationLoading": "Loading location...",
+		"locationUnavailable": "Location unavailable",
+		"forecastResults": "Forecast Results",
+		"buttons": {
+			"today": "Today's Weather",
+			"threeDay": "3-Day Forecast",
+			"fourteenDay": "14-Day Forecast"
+		},
+		"permissionDenied": "Permission to access location was denied",
+		"errorGeocoding": "Error geocoding",
+		"charts": {
+			"precipitation": "Precipitation Amount (mm)",
+			"temperature": "Average Temperature (°C)"
+		}
+	},
+	"navigation": {
+		"tabs": {
+			"home": "Home",
+			"analytics": "Analytics",
+			"settings": "Settings"
+		},
+		"drawer": {
+			"userInfo": "User Info",
+			"changeTheme": "Change Theme",
+			"changeLanguage": "Change Language"
+		}
+	},
+	"weatherCard": {
+		"max": "Max",
+		"min": "Min"
+	},
+	"userInfo": {
+		"name": "Name",
+		"email": "Email",
+		"enterName": "Enter your name",
+		"enterEmail": "Enter your email",
+		"editProfile": "Edit Profile",
+		"saveChanges": "Save Changes",
+		"cancel": "Cancel",
+		"success": "Success",
+		"userInfoUpdated": "User information updated successfully!",
+		"error": "Error",
+		"nameEmailRequired": "Name and email cannot be empty",
+		"invalidEmail": "Please enter a valid email address",
+		"failedLoadData": "Failed to load user data",
+		"failedSaveData": "Failed to save user data",
+		"permissionRequired": "Permission required",
+		"mediaLibraryPermission": "Permission to access the media library is required."
+	}
+}
