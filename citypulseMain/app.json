@@ -1,0 +1,49 @@
+{
+	"expo": {
+		"name": "citypulseMain",
+		"slug": "citypulseMain",
+		"version": "1.0.0",
+		"orientation": "portrait",
+		"icon": "./assets/icon.png",
+		"userInterfaceStyle": "light",
+		"newArchEnabled": true,
+		"splash": {
+			"image": "./assets/splash-icon.png",
+			"resizeMode": "contain",
+			"backgroundColor": "#ffffff"
+		},
+
+		"plugins": [
+			[
+				"@rnmapbox/maps",
+				{
+					"RNMapboxMapsImpl": "mapbox",
+					"RNMapboxMapsVersion": "10.16.4",
+					"RNMapboxAccessToken": "pk.eyJ1Ijoib2xlYXNhbmRpcmsiLCJhIjoiY2x4aXl5a251MDR6bTJ3c25hZG53a2Z1aiJ9.3L8jY92Lg3hG9Z44H2Z4GQ"
+				}
+			],
+			[
+				"expo-location",
+				{
+					"locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
+				}
+			]
+		],
+		"ios": {
+			"supportsTablet": true,
+			"bundleIdentifier": "com.oleksandrik.citypulseMain"
+		},
+		"android": {
+			"adaptiveIcon": {
+				"foregroundImage": "./assets/adaptive-icon.png",
+				"backgroundColor": "#ffffff"
+			},
+			"edgeToEdgeEnabled": true,
+			"predictiveBackGestureEnabled": false,
+			"package": "com.oleksandrik.citypulseMain"
+		},
+		"web": {
+			"favicon": "./assets/favicon.png"
+		}
+	}
+}
