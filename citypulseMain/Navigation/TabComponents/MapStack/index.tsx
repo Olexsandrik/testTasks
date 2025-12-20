@@ -1,11 +1,14 @@
 import { useIsFocused } from "@react-navigation/native";
+import type { OnPressEvent } from "@rnmapbox/maps";
 import MapboxGL from "@rnmapbox/maps";
-
 import * as Location from "expo-location";
 import type { FeatureCollection } from "geojson";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { StyleSheet } from "react-native";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { StyleSheet, View } from "react-native";
+import LineRoute from "../../../components/LineRoute";
+import LocationButton from "../../../components/LocationButton";
 import { MarkerDetails } from "../../../components/MarkerDetails";
+import { useCategory } from "../../../providers/CategoryProvider";
 import type { DataTypeOfMarkers } from "../../../types/type";
 import {
 	circleLayers,
@@ -13,11 +16,26 @@ import {
 	getMarkerConfig,
 } from "../../../untils/unitls";
 
-MapboxGL.setAccessToken(process.env.MAPBOX_TOKEN);
-
-// Circle layer configurations for better readability and maintainability
-
+MapboxGL.setAccessToken(process.env.MAPBOX_TOKEN as string);
 export default function MapStack() {
+	const { directionCoordinates, setSelectedCategory } = useCategory();
+
+	// Додай useEffect щоб відслідковувати зміни
+
+	// Тест щоб переконатися що setSelectedCategory працює
+	// useEffect(() => {
+	// 	if (selectedCategory) {
+	// 		console.log("🎉 selectedCategory змінилося! Тепер буде виклик API...");
+	// 		// Через 2 секунди перевіри чи directionCoordinates оновився
+	// 		setTimeout(() => {
+	// 			console.log(
+	// 				"⏰ Перевірка через 2 сек - directionCoordinates:",
+	// 				directionCoordinates,
+	// 			);
+	// 		}, 2000);
+	// 	}
+	// }, [selectedCategory]);
+
 	const [markers] = useState<DataTypeOfMarkers[]>([
 		{
 			id: 1,
@@ -61,6 +79,7 @@ export default function MapStack() {
 
 	const [selectedMarkerId, setSelectedMarkerId] = useState<number | null>(null);
 	const cameraRef = useRef<MapboxGL.Camera>(null);
+
 	const isFocused = useIsFocused();
 
 	useEffect(() => {
@@ -106,9 +125,36 @@ export default function MapStack() {
 		};
 	}, [markers]);
 
-	const handleMarkerPress = (id: number) => {
-		setSelectedMarkerId(selectedMarkerId === id ? null : id);
-	};
+	const handleMarkerPress = useCallback(
+		(e: OnPressEvent) => {
+			console.log("🎯 handleMarkerPress called with event:", e);
+			if (e?.features[0].geometry.coordinates) {
+				const newCoordinates = e?.features[0].geometry.coordinates as [
+					number,
+					number,
+				];
+				console.log("📍 Extracted coordinates:", newCoordinates);
+
+				if (newCoordinates) {
+					console.log("📷 Moving camera to:", newCoordinates);
+					cameraRef.current?.setCamera({
+						centerCoordinate: [newCoordinates[0], newCoordinates[1]],
+						zoomLevel: 15,
+						animationDuration: 1000,
+					});
+
+					console.log("🏁 Calling setSelectedCategory with:", newCoordinates);
+					setSelectedCategory(newCoordinates);
+					console.log(
+						"✅ setSelectedCategory called - state should update soon...",
+					);
+				}
+			} else {
+				console.log("❌ No coordinates in event");
+			}
+		},
+		[setSelectedCategory],
+	);
 
 	const dynamicCircleLayers = [
 		{
@@ -212,52 +258,100 @@ export default function MapStack() {
 		},
 	];
 
+	const handleLocationPress = async () => {
+		try {
+			const { status } = await Location.requestForegroundPermissionsAsync();
+			if (status !== "granted") {
+				console.warn("Location permission denied");
+				return;
+			}
+
+			const userLocation = await Location.getCurrentPositionAsync();
+			if (!userLocation) return;
+
+			cameraRef.current?.setCamera({
+				centerCoordinate: [
+					userLocation.coords.longitude,
+					userLocation.coords.latitude,
+				],
+				zoomLevel: 15,
+				animationDuration: 1000,
+			});
+		} catch (error) {
+			console.error("Помилка отримання локації:", error);
+		}
+	};
+
 	return (
-		<MapboxGL.MapView style={styles.map}>
-			<MapboxGL.Camera ref={cameraRef} />
-			<MapboxGL.UserLocation />
-
-			<MapboxGL.ShapeSource
-				id="events"
-				shape={mockDataMarkers as FeatureCollection}
-				onPress={(e) =>
-					handleMarkerPress(e.features[0]?.properties?.id as number)
-				}
+		<View style={styles.container}>
+			<MapboxGL.MapView
+				style={styles.container}
+				onPress={() => setSelectedMarkerId(null)}
 			>
-				{dynamicCircleLayers.map((layer) => (
-					<MapboxGL.CircleLayer
-						key={layer.id}
-						id={layer.id}
-						filter={layer.filter}
-						style={layer.style}
-					/>
-				))}
-			</MapboxGL.ShapeSource>
+				<MapboxGL.Camera ref={cameraRef} />
+				<MapboxGL.UserLocation
+					showsUserHeadingIndicator={true}
+					visible={true}
+				/>
 
-			{selectedMarkerId &&
-				(() => {
-					const selectedMarker = markers.find((m) => m.id === selectedMarkerId);
-					if (!selectedMarker) return null;
+				<MapboxGL.ShapeSource
+					id="events"
+					shape={mockDataMarkers as FeatureCollection}
+					onPress={(e: OnPressEvent) => handleMarkerPress(e)}
+				>
+					{dynamicCircleLayers.map((layer) => (
+						<MapboxGL.CircleLayer
+							key={layer.id}
+							id={layer.id}
+							filter={layer.filter}
+							style={layer.style}
+						/>
+					))}
+				</MapboxGL.ShapeSource>
 
-					const config = getMarkerConfig(selectedMarker.type);
+				{selectedMarkerId &&
+					(() => {
+						const selectedMarker = markers.find(
+							(m) => m.id === selectedMarkerId,
+						);
+						if (!selectedMarker) return null;
 
-					return (
-						<MapboxGL.MarkerView
-							key={`callout-${selectedMarker.id}`}
-							coordinate={[selectedMarker.longitude, selectedMarker.latitude]}
-							anchor={{ x: 0.5, y: 1.1 }}
-						>
-							<MarkerDetails config={config} selectedMarker={selectedMarker} />
-						</MapboxGL.MarkerView>
-					);
-				})()}
-		</MapboxGL.MapView>
+						const config = getMarkerConfig(selectedMarker.type);
+
+						return (
+							<MapboxGL.MarkerView
+								key={`callout-${selectedMarker.id}`}
+								coordinate={[selectedMarker.longitude, selectedMarker.latitude]}
+								anchor={{ x: 0.5, y: 1.1 }}
+							>
+								<MarkerDetails
+									config={config}
+									selectedMarker={selectedMarker}
+								/>
+							</MapboxGL.MarkerView>
+						);
+					})()}
+
+				{directionCoordinates && (
+					<LineRoute coordinates={directionCoordinates} />
+				)}
+			</MapboxGL.MapView>
+
+			<LocationButton onPress={handleLocationPress} />
+		</View>
 	);
 }
 
 const styles = StyleSheet.create({
-	map: {
+	container: {
 		flex: 1,
+	},
+	page: {
+		flex: 1,
+		justifyContent: "center",
+		alignItems: "center",
+		backgroundColor: "white",
+		position: "relative",
 	},
 	markerContainer: {
 		backgroundColor: "#fff",
