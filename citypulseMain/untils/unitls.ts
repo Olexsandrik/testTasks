@@ -67,3 +67,43 @@ export const getMarkerConfig = (type: string) => {
 			};
 	}
 };
+
+export const circleLayers: Array<{
+	id: string;
+	filter?: any;
+	style: any;
+}> = [
+	{
+		id: "events-circles",
+		style: {
+			circleRadius: 10,
+			circleColor: [
+				"match",
+				["get", "type"],
+				"music",
+				"#FF6B6B",
+				"food",
+				"#4ECDC4",
+				"art",
+				"#45B7D1",
+				"tech",
+				"#96CEB4",
+				"entertainment",
+				"#FFEAA7",
+				"#A8A8A8",
+			],
+			circleOpacity: 0.95, // Will be dynamic in component
+			circleStrokeWidth: 2,
+			circleStrokeColor: "#FFFFFF",
+			circleStrokeOpacity: 0.8,
+		},
+	},
+	{
+		id: "events-inner-highlight",
+		style: {
+			circleRadius: 6,
+			circleColor: "#FFFFFF",
+			circleOpacity: 0.4, // Will be dynamic in component
+		},
+	},
+];

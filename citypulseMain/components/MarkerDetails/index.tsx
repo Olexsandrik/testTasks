@@ -1,12 +1,13 @@
 import { Ionicons } from "@expo/vector-icons";
-import React from "react";
+
 import { StyleSheet, Text, View } from "react-native";
+import type { MarkerConfig } from "../../types/type";
 
 export const MarkerDetails = ({
 	config,
 	selectedMarker,
 }: {
-	config: any;
+	config: MarkerConfig;
 	selectedMarker: {
 		id: number;
 		name: string;
@@ -36,7 +37,7 @@ export const MarkerDetails = ({
 						},
 					]}
 				>
-					<Ionicons name={config.icon} size={20} color={config.color} />
+					<Ionicons name={config.icon as any} size={20} color={config.color} />
 				</View>
 				<View style={styles.calloutTextContainer}>
 					<Text style={styles.calloutTitle} numberOfLines={2}>

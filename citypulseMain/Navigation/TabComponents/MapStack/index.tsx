@@ -7,11 +7,15 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { StyleSheet } from "react-native";
 import { MarkerDetails } from "../../../components/MarkerDetails";
 import type { DataTypeOfMarkers } from "../../../types/type";
-import { getMarkerColor, getMarkerConfig } from "../../../untils/unitls";
+import {
+	circleLayers,
+	getMarkerColor,
+	getMarkerConfig,
+} from "../../../untils/unitls";
 
-MapboxGL.setAccessToken(
-	"sk.eyJ1Ijoib2xla3NhbmRyaWt3ZWIiLCJhIjoiY21qZTBiYmgyMGJ2MTNjczg5dWU3YnM2ZCJ9.jwaYSRDUwaduwC1rcbDIQA",
-);
+MapboxGL.setAccessToken(process.env.MAPBOX_TOKEN);
+
+// Circle layer configurations for better readability and maintainability
 
 export default function MapStack() {
 	const [markers] = useState<DataTypeOfMarkers[]>([
@@ -106,6 +110,108 @@ export default function MapStack() {
 		setSelectedMarkerId(selectedMarkerId === id ? null : id);
 	};
 
+	const dynamicCircleLayers = [
+		{
+			...circleLayers[0],
+		},
+		{
+			...circleLayers[1],
+		},
+		{
+			id: "selected-event",
+			filter: selectedMarkerId
+				? ["==", ["get", "id"], selectedMarkerId]
+				: ["==", ["get", "id"], -1],
+			style: {
+				circleRadius: 20,
+				circleColor: [
+					"match",
+					["get", "type"],
+					"music",
+					"#FF4757",
+					"food",
+					"#26A69A",
+					"art",
+					"#1976D2",
+					"tech",
+					"#4CAF50",
+					"entertainment",
+					"#FFC107",
+					"#757575",
+				],
+				circleOpacity: 1.0,
+				circleStrokeWidth: 3,
+				circleStrokeColor: "#FFFFFF",
+				circlePitchAlignment: "map",
+			},
+		},
+		{
+			id: "selected-inner-highlight",
+			filter: selectedMarkerId
+				? ["==", ["get", "id"], selectedMarkerId]
+				: ["==", ["get", "id"], -1],
+			style: {
+				circleRadius: 12,
+				circleColor: "#FFFFFF",
+				circleOpacity: 0.6,
+			},
+		},
+		{
+			id: "selected-event-pulse-outer",
+			filter: selectedMarkerId
+				? ["==", ["get", "id"], selectedMarkerId]
+				: ["==", ["get", "id"], -1],
+			style: {
+				circleRadius: 28,
+				circleColor: "transparent",
+				circleOpacity: 0.2,
+				circleStrokeWidth: 1.5,
+				circleStrokeColor: [
+					"match",
+					["get", "type"],
+					"music",
+					"#FF6B6B",
+					"food",
+					"#4ECDC4",
+					"art",
+					"#45B7D1",
+					"tech",
+					"#96CEB4",
+					"entertainment",
+					"#FFEAA7",
+					"#A8A8A8",
+				],
+			},
+		},
+		{
+			id: "selected-event-pulse-inner",
+			filter: selectedMarkerId
+				? ["==", ["get", "id"], selectedMarkerId]
+				: ["==", ["get", "id"], -1],
+			style: {
+				circleRadius: 35,
+				circleColor: "transparent",
+				circleOpacity: 0.1,
+				circleStrokeWidth: 1,
+				circleStrokeColor: [
+					"match",
+					["get", "type"],
+					"music",
+					"#FF6B6B",
+					"food",
+					"#4ECDC4",
+					"art",
+					"#45B7D1",
+					"tech",
+					"#96CEB4",
+					"entertainment",
+					"#FFEAA7",
+					"#A8A8A8",
+				],
+			},
+		},
+	];
+
 	return (
 		<MapboxGL.MapView style={styles.map}>
 			<MapboxGL.Camera ref={cameraRef} />
@@ -118,142 +224,14 @@ export default function MapStack() {
 					handleMarkerPress(e.features[0]?.properties?.id as number)
 				}
 			>
-				<MapboxGL.CircleLayer
-					id="events-circles"
-					style={{
-						circleRadius: 10,
-						circleColor: [
-							"match",
-							["get", "type"],
-							"music",
-							"#FF6B6B",
-							"food",
-							"#4ECDC4",
-							"art",
-							"#45B7D1",
-							"tech",
-							"#96CEB4",
-							"entertainment",
-							"#FFEAA7",
-							"#A8A8A8",
-						],
-						circleOpacity: selectedMarkerId ? 0.3 : 0.95,
-						circleStrokeWidth: 2,
-						circleStrokeColor: "#FFFFFF",
-						circleStrokeOpacity: 0.8,
-					}}
-				/>
-
-				<MapboxGL.CircleLayer
-					id="events-inner-highlight"
-					style={{
-						circleRadius: 6,
-						circleColor: "#FFFFFF",
-						circleOpacity: selectedMarkerId ? 0.2 : 0.4,
-					}}
-				/>
-				<MapboxGL.CircleLayer
-					id="selected-event"
-					filter={
-						selectedMarkerId
-							? ["==", ["get", "id"], selectedMarkerId]
-							: ["==", ["get", "id"], -1]
-					}
-					style={{
-						circleRadius: 20,
-						circleColor: [
-							"match",
-							["get", "type"],
-							"music",
-							"#FF4757",
-							"food",
-							"#26A69A",
-							"art",
-							"#1976D2",
-							"tech",
-							"#4CAF50",
-							"entertainment",
-							"#FFC107",
-							"#757575",
-						],
-						circleOpacity: 1.0,
-						circleStrokeWidth: 3,
-						circleStrokeColor: "#FFFFFF",
-						circlePitchAlignment: "map",
-					}}
-				/>
-				<MapboxGL.CircleLayer
-					id="selected-inner-highlight"
-					filter={
-						selectedMarkerId
-							? ["==", ["get", "id"], selectedMarkerId]
-							: ["==", ["get", "id"], -1]
-					}
-					style={{
-						circleRadius: 12,
-						circleColor: "#FFFFFF",
-						circleOpacity: 0.6,
-					}}
-				/>
-
-				<MapboxGL.CircleLayer
-					id="selected-event-pulse-outer"
-					filter={
-						selectedMarkerId
-							? ["==", ["get", "id"], selectedMarkerId]
-							: ["==", ["get", "id"], -1]
-					}
-					style={{
-						circleRadius: 28,
-						circleColor: "transparent",
-						circleOpacity: 0.2,
-						circleStrokeWidth: 1.5,
-						circleStrokeColor: [
-							"match",
-							["get", "type"],
-							"music",
-							"#FF6B6B",
-							"food",
-							"#4ECDC4",
-							"art",
-							"#45B7D1",
-							"tech",
-							"#96CEB4",
-							"entertainment",
-							"#FFEAA7",
-							"#A8A8A8",
-						],
-					}}
-				/>
-				<MapboxGL.CircleLayer
-					id="selected-event-pulse-inner"
-					filter={
-						selectedMarkerId
-							? ["==", ["get", "id"], selectedMarkerId]
-							: ["==", ["get", "id"], -1]
-					}
-					style={{
-						circleRadius: 35,
-						circleColor: "transparent",
-						circleOpacity: 0.1,
-						circleStrokeWidth: 1,
-						circleStrokeColor: [
-							"match",
-							["get", "type"],
-							"music",
-							"#FF6B6B",
-							"food",
-							"#4ECDC4",
-							"art",
-							"#45B7D1",
-							"tech",
-							"#96CEB4",
-							"entertainment",
-							"#FFEAA7",
-							"#A8A8A8",
-						],
-					}}
-				/>
+				{dynamicCircleLayers.map((layer) => (
+					<MapboxGL.CircleLayer
+						key={layer.id}
+						id={layer.id}
+						filter={layer.filter}
+						style={layer.style}
+					/>
+				))}
 			</MapboxGL.ShapeSource>
 
 			{selectedMarkerId &&
