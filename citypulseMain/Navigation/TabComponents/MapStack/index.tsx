@@ -16,25 +16,11 @@ import {
 	getMarkerConfig,
 } from "../../../untils/unitls";
 
-MapboxGL.setAccessToken(process.env.MAPBOX_TOKEN as string);
+MapboxGL.setAccessToken(
+	`pk.eyJ1Ijoib2xla3NhbmRyaWt3ZWIiLCJhIjoiY21qZW56aDRvMGh1dzNkc2hxOXhlb20xaiJ9.qpSiIaLPr49VOEchCM-uFQ`,
+);
 export default function MapStack() {
 	const { directionCoordinates, setSelectedCategory } = useCategory();
-
-	// Додай useEffect щоб відслідковувати зміни
-
-	// Тест щоб переконатися що setSelectedCategory працює
-	// useEffect(() => {
-	// 	if (selectedCategory) {
-	// 		console.log("🎉 selectedCategory змінилося! Тепер буде виклик API...");
-	// 		// Через 2 секунди перевіри чи directionCoordinates оновився
-	// 		setTimeout(() => {
-	// 			console.log(
-	// 				"⏰ Перевірка через 2 сек - directionCoordinates:",
-	// 				directionCoordinates,
-	// 			);
-	// 		}, 2000);
-	// 	}
-	// }, [selectedCategory]);
 
 	const [markers] = useState<DataTypeOfMarkers[]>([
 		{

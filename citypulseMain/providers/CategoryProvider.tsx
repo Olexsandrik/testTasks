@@ -45,31 +45,29 @@ export default function CategoryProvider({
 		}
 	}, [direction]);
 
-	const fetchDirections = async () => {
-		if (!selectedCategory) return;
-		try {
-			const userLocation = await Location.getCurrentPositionAsync();
-			console.log("Користувач локація:", userLocation.coords);
-			const newDirectionCoordinates = await getDirections(
-				[userLocation.coords.longitude, userLocation.coords.latitude],
-				[selectedCategory[0], selectedCategory[1]] as Position,
-			);
-
-			console.log("API повернув:", newDirectionCoordinates);
-			if (!newDirectionCoordinates?.routes?.[0]?.geometry?.coordinates) {
-				console.error("Невалідна відповідь!");
-			}
-			setDirection(newDirectionCoordinates);
-		} catch (error) {
-			console.error("Error fetching directions:", error);
-		}
-	};
-
 	useEffect(() => {
-		console.log(
-			"🎯 useEffect triggered with selectedCategory:",
-			selectedCategory,
-		);
+		const fetchDirections = async () => {
+			if (!selectedCategory) return;
+			try {
+				const userLocation = await Location.getCurrentPositionAsync();
+				console.log("Користувач локація:", userLocation.coords);
+				const newDirectionCoordinates = await getDirections(
+					[userLocation.coords.longitude, userLocation.coords.latitude],
+					[selectedCategory[0], selectedCategory[1]] as Position,
+				);
+
+				console.log("API повернув:", newDirectionCoordinates);
+				if (newDirectionCoordinates?.routes?.[0]?.geometry?.coordinates) {
+					setDirection(newDirectionCoordinates);
+				} else {
+					console.error("Невалідна відповідь або маршрут не знайдено!");
+					setDirection(null);
+				}
+			} catch (error) {
+				console.error("Error fetching directions:", error);
+				setDirection(null);
+			}
+		};
 		if (selectedCategory) {
 			console.log("🚀 Calling fetchDirections...");
 			fetchDirections(); // Викликай без await - useEffect не може бути async
