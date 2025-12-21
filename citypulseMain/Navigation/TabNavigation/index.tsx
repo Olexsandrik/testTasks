@@ -1,7 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import AlertsTab from "../TabComponents/AlertsTab";
-import MapStack from "../TabComponents/MapStack";
+import PageNavigationAlert from "../PageNavigationAlert";
+import PageNavigation from "../PageNavigationMap";
 import ProfileTab from "../TabComponents/ProfileTab";
 
 const Tab = createBottomTabNavigator();
@@ -20,7 +20,7 @@ export default function TabNavigation() {
 			/>
 			<Tab.Screen
 				name="Alerts"
-				component={AlertsTab}
+				component={PageNavigationAlert}
 				options={{
 					headerShown: false,
 					tabBarIcon: ({ color, size }) => (
@@ -30,7 +30,7 @@ export default function TabNavigation() {
 			/>
 			<Tab.Screen
 				name="Map"
-				component={MapStack}
+				component={PageNavigation}
 				options={{
 					headerShown: false,
 					tabBarIcon: ({ color, size }) => (

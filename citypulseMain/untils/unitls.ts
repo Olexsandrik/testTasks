@@ -107,3 +107,21 @@ export const circleLayers: Array<{
 		},
 	},
 ];
+
+export const markerTypes = [
+	{ label: "Music", value: "music" },
+	{ label: "Food", value: "food" },
+	{ label: "Art", value: "art" },
+	{ label: "Tech", value: "tech" },
+	{ label: "Entertainment", value: "entertainment" },
+	{ label: "Custom", value: "custom" },
+];
+
+export const colors = [
+	{ label: "Red", value: "#FF4757" },
+	{ label: "Blue", value: "#1976D2" },
+	{ label: "Green", value: "#4CAF50" },
+	{ label: "Yellow", value: "#FFC107" },
+	{ label: "Purple", value: "#9C27B0" },
+	{ label: "Orange", value: "#FF9800" },
+];

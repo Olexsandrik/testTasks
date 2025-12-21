@@ -1,5 +1,4 @@
-import { useIsFocused } from "@react-navigation/native";
-import type { OnPressEvent } from "@rnmapbox/maps";
+import { useIsFocused, useNavigation } from "@react-navigation/native";
 import MapboxGL from "@rnmapbox/maps";
 import * as Location from "expo-location";
 import type { FeatureCollection } from "geojson";
@@ -8,68 +7,45 @@ import { StyleSheet, View } from "react-native";
 import LineRoute from "../../../components/LineRoute";
 import LocationButton from "../../../components/LocationButton";
 import { MarkerDetails } from "../../../components/MarkerDetails";
-import { useCategory } from "../../../providers/CategoryProvider";
-import type { DataTypeOfMarkers } from "../../../types/type";
+import { useMapStore } from "../../../store/map.store";
 import {
 	circleLayers,
 	getMarkerColor,
 	getMarkerConfig,
 } from "../../../untils/unitls";
 
-MapboxGL.setAccessToken(
-	`pk.eyJ1Ijoib2xla3NhbmRyaWt3ZWIiLCJhIjoiY21qZW56aDRvMGh1dzNkc2hxOXhlb20xaiJ9.qpSiIaLPr49VOEchCM-uFQ`,
-);
+MapboxGL.setAccessToken(`${process.env.MAPBOX_TOKEN}`);
 export default function MapStack() {
-	const { directionCoordinates, setSelectedCategory } = useCategory();
+	const { dataDirections, setSelectedCategory, setUserLocation, markers } =
+		useMapStore();
 
-	const [markers] = useState<DataTypeOfMarkers[]>([
-		{
-			id: 1,
-			name: "Street Music Festival",
-			type: "music",
-			latitude: 48.9226,
-			longitude: 24.7111,
-		},
-		{
-			id: 2,
-			name: "Food Market",
-			type: "food",
-			latitude: 48.9241,
-			longitude: 24.7053,
-		},
-		{
-			id: 3,
-			name: "Art Exhibition",
-			type: "art",
-			latitude: 48.9189,
-			longitude: 24.7138,
-		},
-		{
-			id: 4,
-			name: "Tech Meetup",
-			type: "tech",
-			latitude: 48.9212,
-			longitude: 24.7205,
-		},
-		{
-			id: 5,
-			name: "Night Cinema",
-			type: "entertainment",
-			latitude: 48.926,
-			longitude: 24.709,
-		},
-	]);
 	const [location, setLocation] = useState<Location.LocationObject | null>(
 		null,
 	);
+
+	const [firstTab, setFirstTab] = useState<[number, number] | null>(null);
 
 	const [selectedMarkerId, setSelectedMarkerId] = useState<number | null>(null);
 	const cameraRef = useRef<MapboxGL.Camera>(null);
 
 	const isFocused = useIsFocused();
 
+	const navigation = useNavigation<any>();
+
+	const handleCreateMerkerWithTab = (coordinates: [number, number]) => {
+		if (!firstTab) {
+			setFirstTab(coordinates);
+			console.log("First tap at:", coordinates);
+
+			navigation.navigate("CustomMarker", { coordinates });
+
+			return;
+		}
+
+		setFirstTab(null);
+	};
+
 	useEffect(() => {
-		// get location of user with use permissions.
 		(async () => {
 			const { status } = await Location.requestForegroundPermissionsAsync();
 			if (status !== "granted") {
@@ -78,11 +54,11 @@ export default function MapStack() {
 			}
 			const loc = await Location.getCurrentPositionAsync({});
 			setLocation(loc);
+			setUserLocation([loc.coords.longitude, loc.coords.latitude]);
 		})();
-	}, []);
+	}, [setUserLocation]);
 
 	useEffect(() => {
-		//focues on geolocation of user
 		if (isFocused && location && cameraRef.current) {
 			cameraRef.current.setCamera({
 				centerCoordinate: [location.coords.longitude, location.coords.latitude],
@@ -112,14 +88,17 @@ export default function MapStack() {
 	}, [markers]);
 
 	const handleMarkerPress = useCallback(
-		(e: OnPressEvent) => {
-			console.log("🎯 handleMarkerPress called with event:", e);
+		(e: any) => {
+			const id = e?.features[0].properties.id;
 			if (e?.features[0].geometry.coordinates) {
 				const newCoordinates = e?.features[0].geometry.coordinates as [
 					number,
 					number,
 				];
-				console.log("📍 Extracted coordinates:", newCoordinates);
+
+				if (id) {
+					setSelectedMarkerId(id);
+				}
 
 				if (newCoordinates) {
 					console.log("📷 Moving camera to:", newCoordinates);
@@ -272,18 +251,23 @@ export default function MapStack() {
 		<View style={styles.container}>
 			<MapboxGL.MapView
 				style={styles.container}
-				onPress={() => setSelectedMarkerId(null)}
+				onPress={(event: any) => {
+					setSelectedMarkerId(null);
+					// Get coordinates from the tap event (longitude, latitude)
+					const coordinates: [number, number] = [
+						event.geometry.coordinates[0],
+						event.geometry.coordinates[1],
+					];
+					handleCreateMerkerWithTab(coordinates);
+				}}
 			>
 				<MapboxGL.Camera ref={cameraRef} />
-				<MapboxGL.UserLocation
-					showsUserHeadingIndicator={true}
-					visible={true}
-				/>
+				<MapboxGL.UserLocation showsUserHeadingIndicator={true} />
 
 				<MapboxGL.ShapeSource
 					id="events"
 					shape={mockDataMarkers as FeatureCollection}
-					onPress={(e: OnPressEvent) => handleMarkerPress(e)}
+					onPress={(e) => handleMarkerPress(e)}
 				>
 					{dynamicCircleLayers.map((layer) => (
 						<MapboxGL.CircleLayer
@@ -295,11 +279,21 @@ export default function MapStack() {
 					))}
 				</MapboxGL.ShapeSource>
 
+				{/* {firstTab && (
+					<MapboxGL.MarkerView
+						coordinate={firstTab}
+						anchor={{ x: 0.5, y: 1.1 }}
+					>
+						<Text>First tap</Text>
+					</MapboxGL.MarkerView>
+				)} */}
 				{selectedMarkerId &&
 					(() => {
 						const selectedMarker = markers.find(
 							(m) => m.id === selectedMarkerId,
 						);
+
+						console.log("selectedMarker", selectedMarker);
 						if (!selectedMarker) return null;
 
 						const config = getMarkerConfig(selectedMarker.type);
@@ -318,8 +312,10 @@ export default function MapStack() {
 						);
 					})()}
 
-				{directionCoordinates && (
-					<LineRoute coordinates={directionCoordinates} />
+				{dataDirections?.routes?.[0]?.geometry?.coordinates && (
+					<LineRoute
+						coordinates={dataDirections.routes[0].geometry.coordinates}
+					/>
 				)}
 			</MapboxGL.MapView>
 

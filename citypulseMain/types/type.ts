@@ -6,6 +6,10 @@ export type DataTypeOfMarkers = {
 	type: string;
 	latitude: number;
 	longitude: number;
+	description?: string;
+	image?: string;
+	typeOfMarker?: string;
+	color?: string;
 };
 
 export type MarkerConfig = {

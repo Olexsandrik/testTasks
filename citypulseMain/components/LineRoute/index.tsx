@@ -1,7 +1,6 @@
 import Mapbox from "@rnmapbox/maps";
 
 export default function LineRoute({ coordinates }: { coordinates: any }) {
-	console.log("dsfsadfsdfasdfasdfas", coordinates);
 	return (
 		<Mapbox.ShapeSource
 			id="routerSource"
