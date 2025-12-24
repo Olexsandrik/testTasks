@@ -1,6 +1,10 @@
 import Mapbox from "@rnmapbox/maps";
 
-export default function LineRoute({ coordinates }: { coordinates: any }) {
+export type LineRouteProps = {
+	coordinates: [number, number][];
+};
+
+export default function LineRoute({ coordinates }: LineRouteProps) {
 	return (
 		<Mapbox.ShapeSource
 			id="routerSource"

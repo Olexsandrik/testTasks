@@ -54,6 +54,9 @@ export const MarkerDetails = ({
 };
 
 const styles = StyleSheet.create({
+	buttonContainer: {
+		padding: 16,
+	},
 	calloutContainer: {
 		backgroundColor: "#FFFFFF",
 		borderRadius: 16,

@@ -1,5 +1,11 @@
-import { useIsFocused, useNavigation } from "@react-navigation/native";
+import {
+	type NavigationProp,
+	useIsFocused,
+	useNavigation,
+} from "@react-navigation/native";
+import type { OnPressEvent } from "@rnmapbox/maps";
 import MapboxGL from "@rnmapbox/maps";
+import Constants from "expo-constants";
 import * as Location from "expo-location";
 import type { FeatureCollection } from "geojson";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -14,7 +20,11 @@ import {
 	getMarkerConfig,
 } from "../../../untils/unitls";
 
-MapboxGL.setAccessToken(`${process.env.MAPBOX_TOKEN}`);
+MapboxGL.setAccessToken(Constants.expoConfig?.extra?.MAPBOX_TOKEN);
+
+export type MapStackPropsNavigation = {
+	CustomMarker: { coordinates: [number, number] };
+};
 export default function MapStack() {
 	const { dataDirections, setSelectedCategory, setUserLocation, markers } =
 		useMapStore();
@@ -30,7 +40,7 @@ export default function MapStack() {
 
 	const isFocused = useIsFocused();
 
-	const navigation = useNavigation<any>();
+	const navigation = useNavigation<NavigationProp<MapStackPropsNavigation>>();
 
 	const handleCreateMerkerWithTab = (coordinates: [number, number]) => {
 		if (!firstTab) {
@@ -88,7 +98,7 @@ export default function MapStack() {
 	}, [markers]);
 
 	const handleMarkerPress = useCallback(
-		(e: any) => {
+		(e: OnPressEvent) => {
 			const id = e?.features[0].properties.id;
 			if (e?.features[0].geometry.coordinates) {
 				const newCoordinates = e?.features[0].geometry.coordinates as [
@@ -251,9 +261,9 @@ export default function MapStack() {
 		<View style={styles.container}>
 			<MapboxGL.MapView
 				style={styles.container}
-				onPress={(event: any) => {
+				onPress={(event: OnPressEvent) => {
 					setSelectedMarkerId(null);
-					// Get coordinates from the tap event (longitude, latitude)
+
 					const coordinates: [number, number] = [
 						event.geometry.coordinates[0],
 						event.geometry.coordinates[1],
@@ -279,18 +289,10 @@ export default function MapStack() {
 					))}
 				</MapboxGL.ShapeSource>
 
-				{/* {firstTab && (
-					<MapboxGL.MarkerView
-						coordinate={firstTab}
-						anchor={{ x: 0.5, y: 1.1 }}
-					>
-						<Text>First tap</Text>
-					</MapboxGL.MarkerView>
-				)} */}
 				{selectedMarkerId &&
 					(() => {
 						const selectedMarker = markers.find(
-							(m) => m.id === selectedMarkerId,
+							(m) => m.id === selectedMarkerId?.toString(),
 						);
 
 						console.log("selectedMarker", selectedMarker);
@@ -306,7 +308,15 @@ export default function MapStack() {
 							>
 								<MarkerDetails
 									config={config}
-									selectedMarker={selectedMarker}
+									selectedMarker={
+										selectedMarker as unknown as {
+											id: number;
+											name: string;
+											type: string;
+											latitude: number;
+											longitude: number;
+										}
+									}
 								/>
 							</MapboxGL.MarkerView>
 						);

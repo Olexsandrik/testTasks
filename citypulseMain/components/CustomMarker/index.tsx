@@ -1,12 +1,17 @@
-import { Ionicons } from "@expo/vector-icons";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import {
+	type NavigationProp,
+	type RouteProp,
+	useNavigation,
+	useRoute,
+} from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import React from "react";
 import { Controller, useForm } from "react-hook-form";
 import {
 	Alert,
+	Button,
 	Image,
-	Pressable,
 	ScrollView,
 	StyleSheet,
 	Text,
@@ -14,16 +19,24 @@ import {
 	TouchableOpacity,
 	View,
 } from "react-native";
-
+import { uploadFile } from "../../api/supabase/store";
+import supabase from "../../api/supabase/supabase";
+import { useSendDataToN8N } from "../../service/useSendDataToN8N";
 import { useMapStore } from "../../store/map.store";
 import type { DataTypeOfMarkers } from "../../types/type";
 import { colors, markerTypes } from "../../untils/unitls";
 
 type MarkerFormData = Omit<DataTypeOfMarkers, "id">;
 
+export type CustomMarkerPropsNavigation = {
+	CustomMarker: { coordinates: [number, number] };
+};
+
 const CustomMarker = () => {
-	const navigation = useNavigation<any>();
-	const route = useRoute<any>();
+	const navigation =
+		useNavigation<NavigationProp<CustomMarkerPropsNavigation>>();
+	const route = useRoute<RouteProp<CustomMarkerPropsNavigation>>();
+	const { sendDataToN8N } = useSendDataToN8N();
 	const { addMarkers } = useMapStore();
 	const { coordinates } = route.params || {};
 
@@ -38,54 +51,105 @@ const CustomMarker = () => {
 		defaultValues: {
 			name: "",
 			type: "",
-			latitude: coordinates?.[1] || 0, // coordinates[1] is latitude
-			longitude: coordinates?.[0] || 0, // coordinates[0] is longitude
+			latitude: coordinates?.[1] || 0,
+			longitude: coordinates?.[0] || 0,
 			description: "",
 			image: "",
 			typeOfMarker: "",
 		},
 	});
 
-	// Watch the image field to display it
 	const watchedImage = watch("image");
 
-	const onSubmit = (data: MarkerFormData) => {
+	const onSubmit = async (data: MarkerFormData) => {
+		const user = await AsyncStorage.getItem("user_data");
+
+		const userId = JSON.parse(user || "").id;
+
 		try {
 			const newMarker: DataTypeOfMarkers = {
-				id: Math.floor(Math.random() * 1000000),
+				user_id: userId,
 				name: data.name,
 				type: data.type,
 				latitude: coordinates?.[1] || data.latitude,
+				description: data.description,
 				longitude: coordinates?.[0] || data.longitude,
+				image: data.image || "",
 				typeOfMarker: "custom",
 			};
 
+			const { data: markerId, error } = await supabase
+				.from("markers")
+				.insert(newMarker)
+				.select("id");
+			if (error) {
+				throw error;
+			}
+
+			await sendDataToN8N({ data: { markerId: markerId[0].id, userId } });
+
 			addMarkers(newMarker);
 			navigation.goBack();
-
 			Alert.alert("Success", "Marker created successfully!");
 			reset();
 		} catch (error) {
 			Alert.alert("Error", "Failed to create marker");
+
 			console.error("Marker creation error:", error);
 		}
 	};
 
 	const takePhoto = async () => {
-		const permission = await ImagePicker.requestCameraPermissionsAsync();
-		if (!permission.granted) {
-			alert("Потрібен доступ до камери");
-			return;
-		}
+		try {
+			// Request permissions
+			const permission =
+				await ImagePicker.requestMediaLibraryPermissionsAsync();
+			if (!permission.granted) {
+				Alert.alert(
+					"Permission denied",
+					"Media library permission is required to select photos",
+				);
+				return;
+			}
 
-		const result = await ImagePicker.launchCameraAsync({
-			allowsEditing: true,
-			aspect: [1, 1], // квадрат для аватарки
-			quality: 0.7,
-		});
+			// Launch image picker
+			const result = await ImagePicker.launchImageLibraryAsync({
+				mediaTypes: ["images"],
+				allowsEditing: true,
+				aspect: [1, 1], // Square aspect for avatar
+				quality: 0.8,
+			});
 
-		if (!result.canceled) {
-			setValue("image", result.assets[0].uri);
+			if (!result.canceled && result.assets && result.assets[0]) {
+				const localUri = result.assets[0].uri;
+
+				// Show loading indicator (you can add a loading state)
+				Alert.alert("Uploading...", "Please wait while we upload your image");
+
+				// Upload to Supabase Storage
+				const uploadResult = await uploadFile(localUri, {
+					fileName: `marker_${Date.now()}_${Math.random().toString(36).substring(2, 15)}.png`,
+				});
+
+				if (uploadResult.success && uploadResult.url) {
+					// Set the uploaded URL in the form
+					setValue("image", uploadResult.url, {
+						shouldValidate: false,
+						shouldDirty: true,
+						shouldTouch: true,
+					});
+
+					Alert.alert("Success", "Image uploaded successfully!");
+				} else {
+					Alert.alert(
+						"Upload Failed",
+						uploadResult.error || "Failed to upload image",
+					);
+				}
+			}
+		} catch (error) {
+			console.error("Photo selection/upload error:", error);
+			Alert.alert("Error", "Failed to select or upload photo");
 		}
 	};
 
@@ -200,7 +264,7 @@ const CustomMarker = () => {
 				</View>
 
 				{/* Image Input */}
-				<Pressable onPress={takePhoto} style={styles.imageContainer}>
+				{/* <Pressable onPress={takePhoto} style={styles.imageContainer}>
 					<Image
 						source={watchedImage ? { uri: watchedImage } : undefined}
 						style={styles.image}
@@ -210,7 +274,13 @@ const CustomMarker = () => {
 							<Ionicons name="camera" size={30} color="#666" />
 						</View>
 					)}
-				</Pressable>
+				</Pressable> */}
+
+				<Button title="Take Photo" onPress={takePhoto} />
+
+				{watchedImage && (
+					<Image source={{ uri: watchedImage }} style={styles.image} />
+				)}
 
 				{/* Marker Type Input */}
 				<View style={styles.inputGroup}>

@@ -1,5 +1,10 @@
 import { Ionicons } from "@expo/vector-icons";
-import { useNavigation, useRoute } from "@react-navigation/native";
+import {
+	type NavigationProp,
+	type RouteProp,
+	useNavigation,
+	useRoute,
+} from "@react-navigation/native";
 import React from "react";
 import {
 	Image,
@@ -9,11 +14,18 @@ import {
 	Text,
 	View,
 } from "react-native";
+import type { DataTypeOfMarkers } from "../../types/type";
 import { getMarkerConfig } from "../../untils/unitls";
 
+export type ListOfMarkersDetailsPropsNavigation = {
+	ListOfMarkersDetails: { marker: DataTypeOfMarkers };
+};
+
 const ListOfMarkersDetails = () => {
-	const navigation = useNavigation();
-	const { marker } = useRoute<any>().params;
+	const navigation =
+		useNavigation<NavigationProp<ListOfMarkersDetailsPropsNavigation>>();
+	const { marker } =
+		useRoute<RouteProp<ListOfMarkersDetailsPropsNavigation>>().params;
 
 	const markerConfig = getMarkerConfig(marker.type || "default");
 

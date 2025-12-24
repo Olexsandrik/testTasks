@@ -32,6 +32,7 @@ interface MapState {
 	clearUserLocation: () => void;
 	addMarkers: (marker: DataTypeOfMarkers) => void;
 	clearError: () => void;
+	removeMarker: (marker: DataTypeOfMarkers) => void;
 }
 
 export const useMapStore = create<MapState>((set, get) => ({
@@ -40,44 +41,14 @@ export const useMapStore = create<MapState>((set, get) => ({
 	dataDirections: null,
 	isLoadingRoute: false,
 	error: null,
-	markers: [
-		{
-			id: 1,
-			name: "Street Music Festival",
-			type: "music",
-			latitude: 48.9226,
-			longitude: 24.7111,
-			typeOfMarker: "custom",
-		},
-		{
-			id: 2,
-			name: "Food Market",
-			type: "food",
-			latitude: 48.9241,
-			longitude: 24.7053,
-		},
-		{
-			id: 3,
-			name: "Art Exhibition",
-			type: "art",
-			latitude: 48.9189,
-			longitude: 24.7138,
-		},
-		{
-			id: 4,
-			name: "Tech Meetup",
-			type: "tech",
-			latitude: 48.9212,
-			longitude: 24.7205,
-		},
-		{
-			id: 5,
-			name: "Night Cinema",
-			type: "entertainment",
-			latitude: 48.926,
-			longitude: 24.709,
-		},
-	],
+
+	markers: [],
+
+	removeMarker: (marker: DataTypeOfMarkers) => {
+		const markers = get().markers as DataTypeOfMarkers[];
+		const result = markers.filter((m) => m.id !== marker.id);
+		set({ markers: result as DataTypeOfMarkers[] });
+	},
 
 	setUserLocation: (coords: Coordinates) => set({ userLocation: coords }),
 	setMarkers: (markers: DataTypeOfMarkers[]) => set({ markers }),
@@ -91,7 +62,7 @@ export const useMapStore = create<MapState>((set, get) => ({
 		const markers = get().markers as DataTypeOfMarkers[];
 
 		const result = [...markers, marker] as DataTypeOfMarkers[];
-		console.log("🛠️ addMarkers called with:", result);
+
 		set({
 			markers: result,
 		});

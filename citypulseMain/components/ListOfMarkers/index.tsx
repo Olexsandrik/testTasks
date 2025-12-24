@@ -20,19 +20,15 @@ export default function ListOfMarkers() {
 		);
 	}
 
-	const markersCustom = markers.filter(
-		(marker) => marker.typeOfMarker === "custom",
-	);
-
 	return (
 		<View style={styles.container}>
-			{markersCustom.length > 0 ? (
+			{markers.length > 0 ? (
 				<FlatList
-					data={markersCustom}
+					data={markers}
 					renderItem={({ item }: { item: DataTypeOfMarkers }) => (
 						<CardOfMarkers marker={item} />
 					)}
-					keyExtractor={(item) => item.id.toString()}
+					keyExtractor={(item, index) => `${item.id}-${index}`}
 					contentContainerStyle={styles.list}
 					showsVerticalScrollIndicator={false}
 				/>

@@ -1,5 +1,14 @@
-export async function getDirections(from: any, to: any) {
-	const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${from[0]},${from[1]};${to[0]},${to[1]}?alternatives=true&annotations=distance%2Cduration&geometries=geojson&language=en&overview=full&steps=true&access_token=${`${process.env.MAPBOX_TOKEN}`}`;
+import Constants from "expo-constants";
+
+const mapboxToken = Constants.expoConfig?.extra?.MAPBOX_TOKEN;
+
+const baseUrl = Constants.expoConfig?.extra?.BASE_URL;
+
+export async function getDirections(
+	from: [number, number],
+	to: [number, number],
+) {
+	const url = `${baseUrl}/driving/${from[0]},${from[1]};${to[0]},${to[1]}?alternatives=true&annotations=distance%2Cduration&geometries=geojson&language=en&overview=full&steps=true&access_token=${mapboxToken}`;
 
 	try {
 		const response = await fetch(url);

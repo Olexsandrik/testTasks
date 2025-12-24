@@ -1,7 +1,8 @@
 //Map integration.
 
 export type DataTypeOfMarkers = {
-	id: number;
+	id?: string;
+	user_id?: string;
 	name: string;
 	type: string;
 	latitude: number;
@@ -10,6 +11,7 @@ export type DataTypeOfMarkers = {
 	image?: string;
 	typeOfMarker?: string;
 	color?: string;
+	created_at?: Date;
 };
 
 export type MarkerConfig = {
@@ -18,6 +20,16 @@ export type MarkerConfig = {
 	icon: string;
 	backgroundColor: string;
 	shadowColor: string;
+};
+
+// User Profile Types
+export type UserProfile = {
+	id: string;
+	username: string;
+	email: string;
+	avatar?: string;
+	createdAt: Date;
+	updatedAt: Date;
 };
 
 //Map integration
